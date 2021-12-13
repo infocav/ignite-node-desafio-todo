@@ -20,7 +20,7 @@ function checksExistsUserAccount(request, response, next) {
     request.user = user;
     next();
   } else {
-      return response.status(404).json({ erro: `Sorry, User ${username} not exists!` });
+      return response.status(404).json({ error: `Sorry, User ${username} not exists!` });
   }
 }
 
@@ -33,7 +33,7 @@ app.post('/users', (request, response) => {
   const { name, username } = request.body;
 
   if (users.some((user) => user.username === username)) {
-    return response.status(400).json({ erro: `Sorry, User ${username} already exists!` });
+    return response.status(400).json({ error: `Sorry, User ${username} already exists!` });
   }
 
   const user = {
@@ -45,7 +45,7 @@ app.post('/users', (request, response) => {
 
   users.push(user);
 
-  response.status(201).json(users);
+  response.status(201).json(user);
 
 });
 
@@ -73,7 +73,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 
   user.todos.push(todo);
 
-  return response.status(201).json(user);
+  return response.status(201).json(todo);
 
 });
 
@@ -86,13 +86,13 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   const todoIndex = returnIndexTodoById(user, id);
 
   if (todoIndex < 0) {
-    return response.status(404).json({erro: "Todo not found!"});
+    return response.status(404).json({error: "Todo not found!"});
   }
   // DESSA FORMA, PERMITE QUE O USUÁRIO MUDE APENAS UM DOS DOIS ATRIBUTOS
   user.todos[todoIndex].title = title ? title : user.todos[todoIndex].title;
   user.todos[todoIndex].deadline = deadline ? new Date(deadline) : user.todos[todoIndex].deadline;
 
-  return response.status(201).json(user);
+  return response.status(201).json(user.todos[todoIndex]);
 
 });
 
@@ -104,13 +104,13 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   const todoIndex = returnIndexTodoById(user, id);
 
   if (todoIndex < 0) {
-    return response.status(404).json({erro: "Todo not found!"});
+    return response.status(404).json({error: "Todo not found!"});
   }
   
   user.todos[todoIndex].done = true;
   // user.todos = user.todos.map((todo) => todo.id === id ? {  ...todo, done: true } : todo);
 
-  return response.json(user.todos);
+  return response.json(user.todos[todoIndex]);
 
 });
 
@@ -122,12 +122,12 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const todoIndex = returnIndexTodoById(user, id);
 
   if (todoIndex < 0) {
-    return response.status(404).json({erro: "Todo not found!"});
+    return response.status(404).json({error: "Todo not found!"});
   }
   
   user.todos.splice(todoIndex, 1);
 
-  return response.status(204);
+  return response.status(204).json(user.todos);
 
 });
 
